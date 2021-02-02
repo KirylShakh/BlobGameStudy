@@ -7,7 +7,10 @@
 		{
 			"Name": "Blob",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
 		}
 	],
 	"TargetPlatforms": [

@@ -13,6 +13,12 @@ class ABlobGameMode : public AGameModeBase
 
 public:
 	ABlobGameMode();
+
+protected:
+	virtual void BeginPlay() override;
+
+private:
+	TArray<AActor*> Obstacles;
 };
 
 
