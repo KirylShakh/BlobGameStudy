@@ -3,7 +3,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Engine/Canvas.h"
-#include "BlobCharacter.h"
+#include "BlobPawn.h"
 #include "BlobHUD.h"
 
 void ABlobHUD::DrawHUD()
@@ -13,7 +13,11 @@ void ABlobHUD::DrawHUD()
     int32 CanvasX = Canvas->SizeX;
     int32 CanvasY = Canvas->SizeY;
 
-    ABlobCharacter* Blob = Cast<ABlobCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+    ABlobPawn* Blob = Cast<ABlobPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+    if (!Blob)
+    {
+        return;
+    }
     TArray<FString> Messages;
     Messages.Add("Time travelled: " + FString::SanitizeFloat(Blob->TimeTravelled));
     Messages.Add("Distance travelled: " + FString::SanitizeFloat(Blob->DistanceTravelled));
