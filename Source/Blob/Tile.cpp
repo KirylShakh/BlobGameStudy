@@ -6,15 +6,13 @@
 
 #include "BlobGameMode.h"
 #include "BlobPawn.h"
+#include "Obstacle.h"
 #include "Tile.h"
 
 // Sets default values
 ATile::ATile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
-	Wrapper = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+ 	Wrapper = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Wrapper;
 
 	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
@@ -34,19 +32,12 @@ void ATile::BeginPlay()
 	TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ATile::OnTrigger);
 }
 
-// Called every frame
-void ATile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void ATile::OnTrigger_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (Cast<ABlobPawn>(OtherActor))
 	{
 		BlobGameMode->AddTile();
-		GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &ATile::DestroyTile, 2.f, false);
+		GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &ATile::DestroyTile, DeathDelay, false);
 	}
 }
 
@@ -56,5 +47,11 @@ void ATile::DestroyTile()
 	{
 		GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 	}
+
+	for (TArray<AObstacle*>::TIterator it = Obstacles.CreateIterator(); it; ++it)
+	{
+		(*it)->Destroy();
+	}
+
 	Destroy();
 }

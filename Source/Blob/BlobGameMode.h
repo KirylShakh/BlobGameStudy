@@ -5,9 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 
-#include "Tile.h"
-
 #include "BlobGameMode.generated.h"
+
+class ATile;
+class AObstacle;
 
 UCLASS(MinimalAPI)
 class ABlobGameMode : public AGameModeBase
@@ -33,11 +34,27 @@ public:
 
 	void AddTile();
 
+	UPROPERTY(EditAnywhere, Category = "Config")
+	TSubclassOf<AObstacle> ObstacleClass;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	float MaxObstaclesPerTile = 10.f;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	float ObstacleWidth = 100.f;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	float LeftBorder = -1000.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Config")
+	float RightBorder = 1000.f;
+
+	void CreateObstacles(ATile* Tile);
+
+	AObstacle* CreateObstacle(float StartY);
+
 protected:
 	virtual void BeginPlay() override;
-
-private:
-	TArray<AActor*> Obstacles;
 };
 
 

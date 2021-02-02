@@ -7,6 +7,8 @@
 
 #include "Tile.generated.h"
 
+class AObstacle;
+
 UCLASS()
 class BLOB_API ATile : public AActor
 {
@@ -21,6 +23,11 @@ public:
 
 	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
 	class UBoxComponent* TriggerBox;
+
+	UPROPERTY(Category = "Config", EditAnywhere, BlueprintReadWrite)
+	float DeathDelay = 10.f;
+
+	TArray<AObstacle*> Obstacles;
 
 protected:
 	// Called when the game starts or when spawned
@@ -38,9 +45,4 @@ protected:
 	FTimerHandle DestroyTimerHandle;
 
 	void DestroyTile();
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 };
