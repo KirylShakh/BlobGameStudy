@@ -4,6 +4,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 
+#include "BlobGameInstance.h"
 #include "BlobPawn.h"
 #include "Obstacle.h"
 
@@ -34,6 +35,6 @@ void AObstacle::OnTrigger_Implementation(UPrimitiveComponent* OverlappedComponen
 	ABlobPawn* Blob = Cast<ABlobPawn>(OtherActor);
 	if (Blob)
 	{
-		Blob->ObstaclesHitCount++;
+		Blob->BlobGameInstance->ObstaclesHitCount++;
 	}
 }

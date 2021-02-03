@@ -39,6 +39,11 @@ public:
 	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
 	class UBlobPawnMovementComponent* MoveCmp;
 
+	class UBlobGameInstance* BlobGameInstance;
+
+	UFUNCTION(BlueprintImplementableEvent, Category="BlobPawn")
+	void OnDriedOut();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -77,16 +82,6 @@ public:
 
 	// Current fall speed
 	float MoveSpeed;
-
-	bool bDriedOut = false;
-
-	// Statistics
-	float TimeTravelled;
-	float DistanceTravelled;
-	float MaxAccumulatedThickness;
-	float MaxAccumulatedSpeed;
-	int32 ObstaclesHitCount;
-	int32 DropletsCollectedCount;
 
 	// Store borders from GameMode to know how far can move
 	float LeftBorder;

@@ -4,6 +4,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 
+#include "BlobGameInstance.h"
 #include "BlobPawn.h"
 #include "Droplet.h"
 
@@ -38,7 +39,7 @@ void ADroplet::OnTrigger_Implementation(UPrimitiveComponent* OverlappedComponent
 	ABlobPawn* Blob = Cast<ABlobPawn>(OtherActor);
 	if (Blob)
 	{
-		Blob->DropletsCollectedCount++;
+		Blob->BlobGameInstance->DropletsCollectedCount++;
 		Blob->UpdateThickness(Thickness);
 		Destroy();
 	}

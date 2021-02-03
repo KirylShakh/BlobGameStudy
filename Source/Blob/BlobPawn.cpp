@@ -9,6 +9,7 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "BlobGameInstance.h"
 #include "BlobGameMode.h"
 #include "BlobPawnMovementComponent.h"
 #include "Droplet.h"
@@ -56,13 +57,8 @@ void ABlobPawn::BeginPlay()
 	MoveSpeed = MinMoveSpeed;
 	Thickness = MaxThickness / 2.f;
 
-	// Statictics
-	TimeTravelled = 0.f;
-	DistanceTravelled = 0.f;
-	MaxAccumulatedThickness = Thickness;
-	MaxAccumulatedSpeed = MoveSpeed;
-	ObstaclesHitCount = 0;
-	DropletsCollectedCount = 0;
+	BlobGameInstance = Cast<UBlobGameInstance>(UGameplayStatics::GetGameInstance(this));
+	BlobGameInstance->ResetStatistics();
 
 	// Borders
 	ABlobGameMode* BlobGameMode = Cast<ABlobGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -128,10 +124,10 @@ void ABlobPawn::Tick(float DeltaTime)
 	UpdateThickness(-ThicknessReduction);
 
 	// Update statistics
-	TimeTravelled += DeltaTime;
-	DistanceTravelled += DeltaDistance;
-	MaxAccumulatedThickness = FGenericPlatformMath::Max(Thickness, MaxAccumulatedThickness);
-	MaxAccumulatedSpeed = FGenericPlatformMath::Max(MoveSpeed, MaxAccumulatedSpeed);
+	BlobGameInstance->TimeTravelled += DeltaTime;
+	BlobGameInstance->DistanceTravelled += DeltaDistance;
+	BlobGameInstance->MaxAccumulatedThickness = FGenericPlatformMath::Max(Thickness, BlobGameInstance->MaxAccumulatedThickness);
+	BlobGameInstance->MaxAccumulatedSpeed = FGenericPlatformMath::Max(MoveSpeed, BlobGameInstance->MaxAccumulatedSpeed);
 }
 
 // Called to bind functionality to input
@@ -154,9 +150,11 @@ void ABlobPawn::UpdateThickness(float DeltaThickness)
 	
 	if (Thickness == MinThickness)
 	{
-		bDriedOut = true;
 		SetActorTickEnabled(false);
+		OnDriedOut();
 	}
+
+	BlobGameInstance->MaxAccumulatedThickness = FGenericPlatformMath::Max(Thickness, BlobGameInstance->MaxAccumulatedThickness);
 
 	Mesh->SetRelativeScale3D(FVector(Thickness));
 }

@@ -23,6 +23,8 @@ public:
 	int32 ObstaclesHitCount = 0;
 	int32 DropletsCollectedCount = 0;
 
+	void ResetStatistics();
+
 	UFUNCTION(BlueprintCallable)
 	FString GetStatistics();
 

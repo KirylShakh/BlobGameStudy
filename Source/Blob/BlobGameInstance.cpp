@@ -14,6 +14,16 @@ FString UBlobGameInstance::GetStatistics()
     return Result;
 }
 
+void UBlobGameInstance::ResetStatistics()
+{
+    TimeTravelled = 0.f;
+    DistanceTravelled = 0.f;
+    MaxAccumulatedThickness = 0.f;
+    MaxAccumulatedSpeed = 0.f;
+    ObstaclesHitCount = 0;
+    DropletsCollectedCount = 0;
+}
+
 TArray<FString> UBlobGameInstance::GetStats()
 {
     TArray<FString> Messages;
