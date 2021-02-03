@@ -92,7 +92,6 @@ void ABlobPawn::Tick(float DeltaTime)
 	float LocationY = GetActorLocation().Y;
 	bool bNearLeftWall = LocationY <= LeftBorder;
 	bool bNearRightWall = LocationY >= RightBorder;
-	//float MoveH = bNearLeftWall ? MoveSpeedH : bNearRightWall ? -MoveSpeedH : MoveDirection.Y * MoveSpeedH;
 	float MoveH = bNearLeftWall ? MoveSpeed : bNearRightWall ? -MoveSpeed : MoveDirection.Y * MoveSpeed;
 
 	// Calculate  movement
@@ -101,24 +100,6 @@ void ABlobPawn::Tick(float DeltaTime)
 
 	float DeltaDistance = Movement.Size();
 	float ThicknessReduction = ThicknessDropRate * DeltaDistance * DeltaTime;
-
-	/*if (DeltaDistance > 0.f)
-	{
-		FHitResult Hit(1.f);
-		RootComponent->MoveComponent(Movement, RootComponent->GetComponentRotation(), true, &Hit);
-
-		if (Hit.IsValidBlockingHit())
-		{
-			GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::White, FString("Hit catched"));
-			MoveSpeed = MinMoveSpeed;
-			ObstaclesHitCount++;
-			ThicknessReduction = ThicknessDropRate * 10.f;
-
-			const FVector Normal2D = Hit.Normal.GetSafeNormal2D();
-			const FVector Deflection = FVector::VectorPlaneProject(Movement, Normal2D) * (1.f - Hit.Time);
-			RootComponent->MoveComponent(Deflection, RootComponent->GetComponentRotation(), true);
-		}
-	}*/
 
 	// Reduce blob thickness based on distance travelled
 	UpdateThickness(-ThicknessReduction);
@@ -147,13 +128,11 @@ UPawnMovementComponent* ABlobPawn::GetMovementComponent() const
 void ABlobPawn::UpdateThickness(float DeltaThickness)
 {
 	Thickness = FMath::Clamp(Thickness + DeltaThickness, MinThickness, MaxThickness);
-	
 	if (Thickness == MinThickness)
 	{
 		SetActorTickEnabled(false);
 		OnDriedOut();
 	}
-
 	BlobGameInstance->MaxAccumulatedThickness = FGenericPlatformMath::Max(Thickness, BlobGameInstance->MaxAccumulatedThickness);
 
 	Mesh->SetRelativeScale3D(FVector(Thickness));

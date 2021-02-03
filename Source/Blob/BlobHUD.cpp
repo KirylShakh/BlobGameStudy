@@ -3,6 +3,8 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Engine/Canvas.h"
+
+#include "BlobGameInstance.h"
 #include "BlobPawn.h"
 #include "BlobHUD.h"
 
@@ -15,14 +17,12 @@ void ABlobHUD::DrawHUD()
     {
         return;
     }
-
-    //DrawEndgameStats(Blob, Canvas->SizeX, Canvas->SizeY);
 }
 
 void ABlobHUD::DrawEndgameStats(ABlobPawn* Blob, int32 CanvasX, int32 CanvasY)
 {
-    //DrawRect(FLinearColor::Black, 0.f, 0.f, CanvasX, CanvasY);
-    //DrawIngameStats(Blob);
+    DrawRect(FLinearColor::Black, 0.f, 0.f, CanvasX, CanvasY);
+    DrawIngameStats(Blob);
 }
 
 void ABlobHUD::DrawIngameStats(ABlobPawn* Blob)
@@ -44,15 +44,15 @@ void ABlobHUD::DrawIngameStats(ABlobPawn* Blob)
 TArray<FString> ABlobHUD::GetStats(ABlobPawn* Blob)
 {
     TArray<FString> Messages;
-    /*Messages.Add("Time travelled: " + FString::SanitizeFloat(Blob->TimeTravelled));
-    Messages.Add("Distance travelled: " + FString::SanitizeFloat(Blob->DistanceTravelled));
-    Messages.Add("Maximum accumulated thickness: " + FString::SanitizeFloat(Blob->MaxAccumulatedThickness));
-    Messages.Add("Maximum accumulated speed: " + FString::SanitizeFloat(Blob->MaxAccumulatedSpeed));
-    Messages.Add("Obstacles hit count: " + FString::FromInt(Blob->ObstaclesHitCount));
-    Messages.Add("Droplets collected count: " + FString::FromInt(Blob->DropletsCollectedCount));
+    Messages.Add("Time travelled: " + FString::SanitizeFloat(Blob->BlobGameInstance->TimeTravelled));
+    Messages.Add("Distance travelled: " + FString::SanitizeFloat(Blob->BlobGameInstance->DistanceTravelled));
+    Messages.Add("Maximum accumulated thickness: " + FString::SanitizeFloat(Blob->BlobGameInstance->MaxAccumulatedThickness));
+    Messages.Add("Maximum accumulated speed: " + FString::SanitizeFloat(Blob->BlobGameInstance->MaxAccumulatedSpeed));
+    Messages.Add("Obstacles hit count: " + FString::FromInt(Blob->BlobGameInstance->ObstaclesHitCount));
+    Messages.Add("Droplets collected count: " + FString::FromInt(Blob->BlobGameInstance->DropletsCollectedCount));
 
     Messages.Add("Current thickness: " + FString::SanitizeFloat(Blob->Thickness));
-    Messages.Add("Current fall speed: " + FString::SanitizeFloat(Blob->MoveSpeed));*/
+    Messages.Add("Current fall speed: " + FString::SanitizeFloat(Blob->MoveSpeed));
 
     return Messages;
 }

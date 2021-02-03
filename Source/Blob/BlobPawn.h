@@ -57,10 +57,6 @@ public:
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float MaxMoveSpeed = 100;
 
-	// The horizontal speed
-	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
-	float MoveSpeedH = 50.f;
-
 	// The gravity acceleration
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float G = 10;
