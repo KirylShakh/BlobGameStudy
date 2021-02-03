@@ -21,6 +21,12 @@ ATile::ATile()
 	TriggerBox->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 }
 
+void ATile::AddPlaceble(AActor* Placeble)
+{
+	Placebles.Add(Placeble);
+	Placeble->OnDestroyed.AddDynamic(this, &ATile::OnPlacebleDestroyed);
+}
+
 // Called when the game starts or when spawned
 void ATile::BeginPlay()
 {
@@ -48,10 +54,21 @@ void ATile::DestroyTile()
 		GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 	}
 
-	for (TArray<AObstacle*>::TIterator it = Obstacles.CreateIterator(); it; ++it)
+	for (TArray<AActor*>::TIterator it = Placebles.CreateIterator(); it; ++it)
 	{
-		(*it)->Destroy();
+		if (*it)
+		{
+			(*it)->Destroy();
+		}
 	}
 
 	Destroy();
+}
+
+void ATile::OnPlacebleDestroyed(AActor* DestroyedActor)
+{
+	if (Placebles.Find(DestroyedActor) != -1)
+	{
+		Placebles.Remove(DestroyedActor);
+	}
 }

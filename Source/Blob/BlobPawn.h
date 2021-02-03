@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "BlobPawn.generated.h"
 
+class ADroplet;
+
 UCLASS()
 class BLOB_API ABlobPawn : public APawn
 {
@@ -76,6 +78,8 @@ public:
 	// Current fall speed
 	float MoveSpeed;
 
+	bool bDriedOut = false;
+
 	// Statistics
 	float TimeTravelled;
 	float DistanceTravelled;
@@ -84,6 +88,10 @@ public:
 	int32 ObstaclesHitCount;
 	int32 DropletsCollectedCount;
 
+	// Store borders from GameMode to know how far can move
+	float LeftBorder;
+	float RightBorder;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -91,4 +99,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual UPawnMovementComponent* GetMovementComponent() const override;
+
+	void UpdateThickness(float DeltaThickness);
 };

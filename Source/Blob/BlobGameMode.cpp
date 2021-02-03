@@ -3,6 +3,7 @@
 #include "BlobPawn.h"
 #include "Tile.h"
 #include "Obstacle.h"
+#include "Droplet.h"
 #include "BlobGameMode.h"
 
 ABlobGameMode::ABlobGameMode()
@@ -30,12 +31,12 @@ void ABlobGameMode::AddTile()
 	ATile* Tile = GetWorld()->SpawnActor<ATile>(TileClass, NextSpawnPoint);
 	if (Tile)
 	{
-		CreateObstacles(Tile);
+		CreatePlacebles(Tile);
 		NextSpawnPoint = FTransform(FVector(0.f, 0.f, NextSpawnPoint.GetTranslation().Z - TileHeight));
 	}
 }
 
-void ABlobGameMode::CreateObstacles(ATile* Tile)
+void ABlobGameMode::CreatePlacebles(ATile* Tile)
 {
 	float RandDeltaY = FMath::FRandRange(0.f, ObstacleWidth);
 	float Y = LeftBorder + RandDeltaY + ObstacleWidth / 2.f;
@@ -53,7 +54,15 @@ void ABlobGameMode::CreateObstacles(ATile* Tile)
 	for (int32 i = 0; i < NumObstacles; i++)
 	{
 		int32 Index = FMath::FloorToInt(FMath::FRandRange(0.f, (float)PotentialSpawnPoints.Num() - .6f));
-		Tile->Obstacles.Add(CreateObstacle(PotentialSpawnPoints[Index]));
+		Tile->AddPlaceble(CreateObstacle(PotentialSpawnPoints[Index]));
+		PotentialSpawnPoints.RemoveAt(Index);
+	}
+
+	int32 NumDroplets = FMath::FloorToInt(FMath::FRandRange(0.f, MaxDropletsPerTile));
+	for (int32 i = 0; i < NumDroplets; i++)
+	{
+		int32 Index = FMath::FloorToInt(FMath::FRandRange(0.f, (float)PotentialSpawnPoints.Num() - .6f));
+		Tile->AddPlaceble(CreateDroplet(PotentialSpawnPoints[Index]));
 		PotentialSpawnPoints.RemoveAt(Index);
 	}
 }
@@ -66,4 +75,14 @@ AObstacle* ABlobGameMode::CreateObstacle(float SpawnY)
 	float SpawnZ = FMath::FRandRange(NextSpawnPoint.GetTranslation().Z, NextSpawnPoint.GetTranslation().Z + TileHeight);
 	const FTransform SpawnTransform = FTransform(FVector(0.f, SpawnY, SpawnZ));
 	return GetWorld()->SpawnActor<AObstacle>(ObstacleClass, SpawnTransform, SpawnParameters);
+}
+
+ADroplet* ABlobGameMode::CreateDroplet(float SpawnY)
+{
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	float SpawnZ = FMath::FRandRange(NextSpawnPoint.GetTranslation().Z, NextSpawnPoint.GetTranslation().Z + TileHeight);
+	const FTransform SpawnTransform = FTransform(FVector(0.f, SpawnY, SpawnZ));
+	return GetWorld()->SpawnActor<ADroplet>(DropletClass, SpawnTransform, SpawnParameters);
 }

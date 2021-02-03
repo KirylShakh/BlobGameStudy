@@ -6,9 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "BlobHUD.generated.h"
 
-/**
- * 
- */
+class ABlobPawn;
+
 UCLASS()
 class BLOB_API ABlobHUD : public AHUD
 {
@@ -24,6 +23,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Text)
 	float PadY = 20.f;
 
-
 	virtual void DrawHUD() override;
+
+protected:
+	void DrawEndgameStats(ABlobPawn* Blob, int32 CanvasX, int32 CanvasY);
+
+	void DrawIngameStats(ABlobPawn* Blob);
+
+	TArray<FString> GetStats(ABlobPawn* Blob);
 };

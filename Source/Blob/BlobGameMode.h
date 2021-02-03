@@ -9,6 +9,7 @@
 
 class ATile;
 class AObstacle;
+class ADroplet;
 
 UCLASS(MinimalAPI)
 class ABlobGameMode : public AGameModeBase
@@ -35,6 +36,13 @@ public:
 	void AddTile();
 
 	UPROPERTY(EditAnywhere, Category = "Config")
+	float LeftBorder = -1000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	float RightBorder = 1000.f;
+
+	// Obstacle vars
+	UPROPERTY(EditAnywhere, Category = "Config")
 	TSubclassOf<AObstacle> ObstacleClass;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
@@ -43,18 +51,24 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Config")
 	float ObstacleWidth = 100.f;
 
+	// Droplet vars
 	UPROPERTY(EditAnywhere, Category = "Config")
-	float LeftBorder = -1000.f;
-	
+	TSubclassOf<ADroplet> DropletClass;
+
 	UPROPERTY(EditAnywhere, Category = "Config")
-	float RightBorder = 1000.f;
+	float MaxDropletsPerTile = 3.f;
 
-	void CreateObstacles(ATile* Tile);
-
-	AObstacle* CreateObstacle(float StartY);
+	UPROPERTY(EditAnywhere, Category = "Config")
+	float DropletWidth = 100.f;
 
 protected:
 	virtual void BeginPlay() override;
+
+	void CreatePlacebles(ATile* Tile);
+
+	AObstacle* CreateObstacle(float StartY);
+
+	ADroplet* CreateDroplet(float StartY);
 };
 
 

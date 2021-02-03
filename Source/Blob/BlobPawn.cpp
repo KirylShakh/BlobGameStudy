@@ -7,8 +7,11 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
+#include "BlobGameMode.h"
 #include "BlobPawnMovementComponent.h"
+#include "Droplet.h"
 #include "BlobPawn.h"
 
 const FName ABlobPawn::MoveForwardBinding("MoveForward");
@@ -60,6 +63,12 @@ void ABlobPawn::BeginPlay()
 	MaxAccumulatedSpeed = MoveSpeed;
 	ObstaclesHitCount = 0;
 	DropletsCollectedCount = 0;
+
+	// Borders
+	ABlobGameMode* BlobGameMode = Cast<ABlobGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	check(BlobGameMode);
+	LeftBorder = BlobGameMode->LeftBorder;
+	RightBorder = BlobGameMode->RightBorder;
 }
 
 // Called every frame
@@ -83,8 +92,15 @@ void ABlobPawn::Tick(float DeltaTime)
 	// Adjust vertical speed based on gravity
 	MoveSpeed = FGenericPlatformMath::Min(MoveSpeed + AccelerationZ, MaxMoveSpeed);
 
+	// Calculate horizontal offset
+	float LocationY = GetActorLocation().Y;
+	bool bNearLeftWall = LocationY <= LeftBorder;
+	bool bNearRightWall = LocationY >= RightBorder;
+	//float MoveH = bNearLeftWall ? MoveSpeedH : bNearRightWall ? -MoveSpeedH : MoveDirection.Y * MoveSpeedH;
+	float MoveH = bNearLeftWall ? MoveSpeed : bNearRightWall ? -MoveSpeed : MoveDirection.Y * MoveSpeed;
+
 	// Calculate  movement
-	const FVector Movement = FVector(MoveDirection.X, MoveDirection.Y * MoveSpeedH, -MoveSpeed);
+	const FVector Movement = FVector(MoveDirection.X, MoveH, -MoveSpeed);
 	AddMovementInput(Movement, DeltaTime);
 
 	float DeltaDistance = Movement.Size();
@@ -109,8 +125,7 @@ void ABlobPawn::Tick(float DeltaTime)
 	}*/
 
 	// Reduce blob thickness based on distance travelled
-	Thickness = FGenericPlatformMath::Max(Thickness - ThicknessReduction, MinThickness);
-	RootComponent->GetChildComponent(0)->SetRelativeScale3D(FVector(Thickness));
+	UpdateThickness(-ThicknessReduction);
 
 	// Update statistics
 	TimeTravelled += DeltaTime;
@@ -131,4 +146,17 @@ void ABlobPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 UPawnMovementComponent* ABlobPawn::GetMovementComponent() const
 {
 	return MoveCmp;
+}
+
+void ABlobPawn::UpdateThickness(float DeltaThickness)
+{
+	Thickness = FMath::Clamp(Thickness + DeltaThickness, MinThickness, MaxThickness);
+	
+	if (Thickness == MinThickness)
+	{
+		bDriedOut = true;
+		SetActorTickEnabled(false);
+	}
+
+	Mesh->SetRelativeScale3D(FVector(Thickness));
 }

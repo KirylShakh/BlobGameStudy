@@ -14,7 +14,7 @@ void UBlobPawnMovementComponent::TickComponent(float DeltaTime, enum ELevelTick 
     }
 
     // Get (and then clear) the movement vector that we set in ACollidingPawn::Tick
-    FVector DesiredMovementThisFrame = ConsumeInputVector().GetClampedToMaxSize(1.0f) * DeltaTime * 150.0f;
+    FVector DesiredMovementThisFrame = ConsumeInputVector();// .GetClampedToMaxSize(1.0f)* DeltaTime * 150.0f;
     if (!DesiredMovementThisFrame.IsNearlyZero())
     {
         FHitResult Hit;
@@ -23,6 +23,7 @@ void UBlobPawnMovementComponent::TickComponent(float DeltaTime, enum ELevelTick 
         // If we bumped into something, try to slide along it
         if (Hit.IsValidBlockingHit())
         {
+            UE_LOG(LogTemp, Warning, TEXT("Hit"));
             SlideAlongSurface(DesiredMovementThisFrame, 1.f - Hit.Time, Hit.Normal, Hit);
         }
     }

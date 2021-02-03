@@ -4,47 +4,40 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-
-#include "Tile.generated.h"
+#include "Droplet.generated.h"
 
 UCLASS()
-class BLOB_API ATile : public AActor
+class BLOB_API ADroplet : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ATile();
+	ADroplet();
 
 	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
 	class USceneComponent* Wrapper;
 
 	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
-	class UBoxComponent* TriggerBox;
+	class UStaticMeshComponent* Mesh;
+
+	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
+	class UCapsuleComponent* CapsuleCmp;
 
 	UPROPERTY(Category = "Config", EditAnywhere, BlueprintReadWrite)
-	float DeathDelay = 10.f;
+	float MinThickness = .3f;
 
-	void AddPlaceble(AActor* Placeble);
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	UPROPERTY(VisibleInstanceOnly)
-	class ABlobGameMode* BlobGameMode;
+	UPROPERTY(Category = "Config", EditAnywhere, BlueprintReadWrite)
+	float MaxThickness = 1.f;
 
 	UFUNCTION(BlueprintNativeEvent, Category = Collision)
 	void OnTrigger(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	void OnTrigger_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UPROPERTY()
-	FTimerHandle DestroyTimerHandle;
+	float Thickness;
 
-	void DestroyTile();
-
-	TArray<AActor*> Placebles;
-
-	void OnPlacebleDestroyed(AActor* DestroyedActor);
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 };
