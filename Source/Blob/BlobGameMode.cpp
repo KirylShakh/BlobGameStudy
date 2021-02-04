@@ -1,10 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+#include "BlobGameMode.h"
 #include "BlobPawn.h"
 #include "Tile.h"
 #include "Obstacle.h"
 #include "Droplet.h"
-#include "BlobGameMode.h"
 
 ABlobGameMode::ABlobGameMode()
 {

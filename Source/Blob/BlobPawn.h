@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "BlobPawn.generated.h"
 
-class ADroplet;
+class ABlobPiecePawn;
 
 UCLASS()
 class BLOB_API ABlobPawn : public APawn
@@ -22,13 +22,10 @@ public:
 	static const FName MoveRightBinding;
 
 	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
-	class USceneComponent* Wrapper;
+	class UCapsuleComponent* CapsuleCmp;
 
 	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* Mesh;
-
-	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
-	class UCapsuleComponent* CapsuleCmp;
 
 	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
 	class USpringArmComponent* CameraArm;
@@ -47,6 +44,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// To store base proportions of the pawn
+	FVector BaseScale;
 
 public:
 	// The min speed blob can fall
@@ -69,19 +69,25 @@ public:
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float MaxThickness = 2.f;
 
+	// Starting factor value of how much water can be accumulated in droplet
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	float StartingThickness = 1.f;
+
 	// How fast thickness will fall during movement
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float ThicknessDropRate = .001f;
 
-	// How much water is currently present in droplet
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	float LostOnHitPart = .1f;
+
+	UPROPERTY(EditAnywhere, Category = Gameplay)
+	TSubclassOf<ABlobPiecePawn> BlopPieceClass;
+
+	// Factor of scale - shows how much water is currently present in droplet
 	float Thickness;
 
 	// Current fall speed
 	float MoveSpeed;
-
-	// Store borders from GameMode to know how far can move
-	float LeftBorder;
-	float RightBorder;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -92,4 +98,6 @@ public:
 	virtual UPawnMovementComponent* GetMovementComponent() const override;
 
 	void UpdateThickness(float DeltaThickness);
+
+	void SpawnBlobPiece();
 };

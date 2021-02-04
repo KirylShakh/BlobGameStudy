@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BlobPawnMovementComponent.h"
 #include "BlobPiecePawn.h"
+#include "BlobPawnMovementComponent.h"
 
 // Sets default values
 ABlobPiecePawn::ABlobPiecePawn()
@@ -27,7 +27,7 @@ void ABlobPiecePawn::SetupMove(float MoveSpeed, float iThickness)
 	Mesh->SetRelativeScale3D(FVector(Thickness));
 
 	FallDirectionY = FMath::FRandRange(0.f, 1.f) < 0.5f ? -1.f : 1.f;
-	MoveDirection = FVector(0.f, MoveSpeed, MoveSpeed);
+	MoveDirection = FVector(0.f, MoveSpeed, StartSpeedZ);
 }
 
 void ABlobPiecePawn::DestroyBlobPiece()
@@ -52,10 +52,17 @@ void ABlobPiecePawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	float DeltaY = FallDirectionY * (MoveDirection.Y * DeltaTime + A * DeltaTime * DeltaTime / 2.f);
+	float DeltaY = FallDirectionY != 0.f ? FallDirectionY * (MoveDirection.Y * DeltaTime + A * DeltaTime * DeltaTime / 2.f) : 0.f;
 	float DeltaZ = MoveDirection.Z * DeltaTime + G * DeltaTime * DeltaTime / 2.f;
 	AddMovementInput(FVector(0.f, DeltaY, DeltaZ));
 
 	MoveDirection.Y += A * DeltaTime;
+	if (MoveDirection.Y < 0.f)
+	{
+		MoveDirection.Y = 0.f;
+	}
 	MoveDirection.Z += G * DeltaTime;
+
+	Thickness -= Thickness * DeltaTime;
+	Mesh->SetRelativeScale3D(FVector(Thickness));
 }

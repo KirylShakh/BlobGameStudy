@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Kismet/GameplayStatics.h"
-#include "Engine/Canvas.h"
-
+#include "BlobHUD.h"
 #include "BlobGameInstance.h"
 #include "BlobPawn.h"
-#include "BlobHUD.h"
+
+#include "Kismet/GameplayStatics.h"
+#include "Engine/Canvas.h"
 
 void ABlobHUD::DrawHUD()
 {

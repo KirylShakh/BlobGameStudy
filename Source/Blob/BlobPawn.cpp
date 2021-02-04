@@ -1,19 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Components/SceneComponent.h"
+#include "BlobPawn.h"
+#include "BlobGameInstance.h"
+#include "BlobPawnMovementComponent.h"
+#include "BlobPiecePawn.h"
+
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-
-#include "BlobGameInstance.h"
-#include "BlobGameMode.h"
-#include "BlobPawnMovementComponent.h"
-#include "Droplet.h"
-#include "BlobPawn.h"
 
 const FName ABlobPawn::MoveForwardBinding("MoveForward");
 const FName ABlobPawn::MoveRightBinding("MoveRight");
@@ -24,17 +22,15 @@ ABlobPawn::ABlobPawn()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	Wrapper = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	RootComponent = Wrapper;
+	CapsuleCmp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
+	CapsuleCmp->SetRelativeScale3D(FVector(1.5f, 1.5f, .8f));
+	CapsuleCmp->SetCollisionProfileName(TEXT("Pawn"));
+	SetRootComponent(CapsuleCmp);
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	Mesh->SetCollisionProfileName(TEXT("Pawn"));
-	Mesh->SetupAttachment(RootComponent);
-
-	CapsuleCmp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
-	CapsuleCmp->SetRelativeScale3D(FVector(5.f, 3.f, 1.25f));
-	CapsuleCmp->SetCollisionProfileName(TEXT("Pawn"));
-	CapsuleCmp->SetupAttachment(Mesh);
+	Mesh->SetRelativeScale3D(FVector(.45f, .45f, .8f));
+	Mesh->SetupAttachment(CapsuleCmp);
 
 	CameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraArm"));
 	CameraArm->TargetArmLength = 900.f;
@@ -54,17 +50,12 @@ void ABlobPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+	BaseScale = RootComponent->GetRelativeScale3D();
+	Thickness = StartingThickness;
 	MoveSpeed = MinMoveSpeed;
-	Thickness = MaxThickness / 2.f;
 
 	BlobGameInstance = Cast<UBlobGameInstance>(UGameplayStatics::GetGameInstance(this));
 	BlobGameInstance->ResetStatistics();
-
-	// Borders
-	ABlobGameMode* BlobGameMode = Cast<ABlobGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	check(BlobGameMode);
-	LeftBorder = BlobGameMode->LeftBorder;
-	RightBorder = BlobGameMode->RightBorder;
 }
 
 // Called every frame
@@ -89,10 +80,7 @@ void ABlobPawn::Tick(float DeltaTime)
 	MoveSpeed = FGenericPlatformMath::Min(MoveSpeed + AccelerationZ, MaxMoveSpeed);
 
 	// Calculate horizontal offset
-	float LocationY = GetActorLocation().Y;
-	bool bNearLeftWall = LocationY <= LeftBorder;
-	bool bNearRightWall = LocationY >= RightBorder;
-	float MoveH = bNearLeftWall ? MoveSpeed : bNearRightWall ? -MoveSpeed : MoveDirection.Y * MoveSpeed;
+	float MoveH = MoveDirection.Y * MoveSpeed;
 
 	// Calculate  movement
 	const FVector Movement = FVector(MoveDirection.X, MoveH, -MoveSpeed);
@@ -100,7 +88,6 @@ void ABlobPawn::Tick(float DeltaTime)
 
 	float DeltaDistance = Movement.Size();
 	float ThicknessReduction = ThicknessDropRate * DeltaDistance * DeltaTime;
-
 	// Reduce blob thickness based on distance travelled
 	UpdateThickness(-ThicknessReduction);
 
@@ -133,7 +120,25 @@ void ABlobPawn::UpdateThickness(float DeltaThickness)
 		SetActorTickEnabled(false);
 		OnDriedOut();
 	}
-	BlobGameInstance->MaxAccumulatedThickness = FGenericPlatformMath::Max(Thickness, BlobGameInstance->MaxAccumulatedThickness);
 
-	Mesh->SetRelativeScale3D(FVector(Thickness));
+	RootComponent->SetRelativeScale3D(BaseScale * Thickness);
+}
+
+void ABlobPawn::SpawnBlobPiece()
+{
+	float LostThickness = Thickness * LostOnHitPart;
+	UpdateThickness(-LostThickness);
+
+	float LostSpeed = MoveSpeed * LostOnHitPart;
+	MoveSpeed = FGenericPlatformMath::Max(MoveSpeed - LostSpeed, MinMoveSpeed);
+
+	// Spawn blob piece
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	ABlobPiecePawn* BlobPiece = GetWorld()->SpawnActor<ABlobPiecePawn>(BlopPieceClass, FTransform(GetTransform().GetLocation()), SpawnParameters);
+	if (BlobPiece)
+	{
+		BlobPiece->SetupMove(LostSpeed * 2, LostThickness);
+	}
 }

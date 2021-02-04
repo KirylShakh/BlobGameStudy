@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Obstacle.generated.h"
 
-class ABlobPiecePawn;
+class ABlobPawn;
 
 UCLASS()
 class BLOB_API AObstacle : public AActor
@@ -18,25 +18,13 @@ public:
 	AObstacle();
 
 	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
-	class USceneComponent* Wrapper;
-
-	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* Mesh;
 
 	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
 	class UCapsuleComponent* CapsuleCmp;
 
-	UPROPERTY(EditAnywhere, Category = "Config")
-	TSubclassOf<ABlobPiecePawn> BlopPieceClass;
-
-	UFUNCTION(BlueprintNativeEvent, Category = Collision)
-	void OnTrigger(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	void OnTrigger_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnHit(ABlobPawn* Blob);
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	bool bCollideWithBlob = true;
+	bool bMetWithBlob = false;
 };

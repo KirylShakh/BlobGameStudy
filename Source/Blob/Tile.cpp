@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+
+#include "Tile.h"
+#include "BlobGameMode.h"
+#include "BlobPawn.h"
+
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
-
-#include "BlobGameMode.h"
-#include "BlobPawn.h"
-#include "Obstacle.h"
-#include "Tile.h"
 
 // Sets default values
 ATile::ATile()
@@ -54,13 +54,14 @@ void ATile::DestroyTile()
 		GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 	}
 
-	for (TArray<AActor*>::TIterator it = Placebles.CreateIterator(); it; ++it)
+	for (int i = 0; i < Placebles.Num(); i++)
 	{
-		if (*it)
+		if (Placebles[i])
 		{
-			(*it)->Destroy();
+			Placebles[i]->Destroy();
 		}
 	}
+	Placebles.Empty();
 
 	Destroy();
 }

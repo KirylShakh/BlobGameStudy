@@ -24,22 +24,38 @@ public:
 	UPROPERTY(Category = "Components", EditAnywhere, BlueprintReadWrite)
 	class UBlobPawnMovementComponent* MoveCmp;
 
-	float Thickness;
-	FVector MoveDirection;
+	// Vertical acceleration
+	UPROPERTY(Category = "Config", EditAnywhere, BlueprintReadWrite)
 	float G = -50.f;
+
+	// Horizontal acceleration
+	UPROPERTY(Category = "Config", EditAnywhere, BlueprintReadWrite)
 	float A = -10.f;
-	float FallDirectionY;
 
 	void SetupMove(float MoveSpeed, float iThickness);
 
+	// Death properties
 	UPROPERTY()
 	FTimerHandle DestroyTimerHandle;
+
 	float DeathDelay = 2.f;
 	void DestroyBlobPiece();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// How much water is there in a blob piece (scale)
+	float Thickness;
+
+	// Vector to store current move speeds
+	FVector MoveDirection;
+
+	// Starting vertical speed (currently pieces will fly upwards for a short time)
+	float StartSpeedZ = 50.f;
+
+	// Random horizontal direction of the piece - will it fly left or right from the blob
+	float FallDirectionY;
 
 public:	
 	// Called every frame

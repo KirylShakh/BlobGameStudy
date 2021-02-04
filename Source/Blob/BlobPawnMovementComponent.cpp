@@ -2,6 +2,8 @@
 
 
 #include "BlobPawnMovementComponent.h"
+#include "Obstacle.h"
+#include "BlobPawn.h"
 
 void UBlobPawnMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -23,8 +25,18 @@ void UBlobPawnMovementComponent::TickComponent(float DeltaTime, enum ELevelTick 
         // If we bumped into something, try to slide along it
         if (Hit.IsValidBlockingHit())
         {
-            UE_LOG(LogTemp, Warning, TEXT("Hit"));
             SlideAlongSurface(DesiredMovementThisFrame, 1.f - Hit.Time, Hit.Normal, Hit);
+
+            ABlobPawn* Blob = Cast<ABlobPawn>(PawnOwner);
+            if (Blob)
+            {
+                AObstacle* Obstacle = Cast<AObstacle>(Hit.GetActor());
+                if (Obstacle)
+                {
+                    Obstacle->OnHit(Blob);
+                }
+                Blob->SpawnBlobPiece();
+            }
         }
     }
 };

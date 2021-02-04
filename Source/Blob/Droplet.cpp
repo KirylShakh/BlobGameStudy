@@ -1,12 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+
+#include "Droplet.h"
+#include "BlobGameInstance.h"
+#include "BlobPawn.h"
+
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
-
-#include "BlobGameInstance.h"
-#include "BlobPawn.h"
-#include "Droplet.h"
 
 // Sets default values
 ADroplet::ADroplet()
