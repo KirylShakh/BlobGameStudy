@@ -4,4 +4,4 @@ Build
 DerivedDataCache
 Intermediate
 Saved
-Content
+Content/**/Maps/*.uasset
